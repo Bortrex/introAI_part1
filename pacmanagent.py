@@ -31,11 +31,13 @@ class PacmanAgent(Agent):
         # return Directions.STOP
         legals = state.getLegalActions()
         legals.remove(Directions.STOP)
-        print(state.getFood())
-        print("\n")
-        print(state.getWalls())
 
-        print(state.getPacmanPosition())
+        # print(state.getFood())
+        # print("\n")
+        # print(state.getWalls())
+
+        # print(state.getPacmanPosition())
+        print(state.generatePacmanSuccessors())
 
         action = legals[self.select_best_move(legals, state)]
         print(action)
@@ -52,17 +54,18 @@ class PacmanAgent(Agent):
         posFood = []
         # print(currentFood.width)
         # print(currentFood.height)
-        print(len(currentFood))
-        print(len(currentFood[0]))
+        # print(len(currentFood))
+        # print(len(currentFood[0]))
+
         for i in range(len(currentFood)): # columns
             for j in  range(len(currentFood[0])): # rows
                 if currentFood[i][j] == True:
-                    print("the other one -> ", currentFood[i][j], i, j)
+                    # print("the other one -> ", currentFood[i][j], i, j)
                     posFood.append((i,j))
         # posFood = [[(i,j) for j in range(len(currentFood[0])) if currentFood[i][j] == True] for i in range(len(currentFood))]
         # print(posFood)
-        print(np.shape(posFood))
-        distances = self.get_distance(posFood, state.getPacmanPosition(), kind='manhattan')
+        # print("Shape of posFood",np.shape(posFood))
+        distances = self.get_distances(posFood, state.getPacmanPosition(), legals, kind='manhattan')
 
 
         print(legals, len(legals))
@@ -70,15 +73,29 @@ class PacmanAgent(Agent):
         print(legal)
         return legal
 
-    def get_distance(self, posFood, posPacman, kind='euclidean'):
+    def get_distances(self, posFood, posPacman, s, kind='euclidean'):
         from scipy.spatial import distance
         dist = []
-        # print((posPacman))
-        if kind == 'euclidean':
-            for i in posFood:
-                dist.append(distance.euclidean(i, posPacman))
-        elif kind == 'manhattan':
-            dist.append([distance.cityblock(i, posPacman) for i in posFood])
+        print("actualPacmanPos -> ",posPacman)
+
+        a, b = posPacman
+        for i in s:
+            if i == 'North':
+                posPacman = [a + 1, b]
+            if i == 'South':
+                posPacman = [a - 1, b]
+            if i == 'East':
+                posPacman = [a, b + 1]
+            if i == 'West':
+                posPacman = [a, b - 1]
+
+            # print("the future {} position ".format(i), posPacman)
+
+            if kind == 'euclidean':
+                for i in posFood:
+                    dist.append(distance.euclidean(i, posPacman))
+            elif kind == 'manhattan':
+                dist.append([distance.cityblock(i, posPacman) for i in posFood])
             # eu = [distance.euclidean(i, posPacman) for i in posFood]
             # print(dist)
             # print(eu)
