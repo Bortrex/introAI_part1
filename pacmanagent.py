@@ -38,9 +38,9 @@ class PacmanAgent(Agent):
 
         # print(state.getPacmanPosition())
         print(state.generatePacmanSuccessors())
-
+        print(legals, len(legals))
         action = legals[self.select_best_move(legals, state)]
-        print(action)
+        print(action, "\n\n")
 
         return action
 
@@ -68,7 +68,7 @@ class PacmanAgent(Agent):
         distances = self.get_distances(posFood, state.getPacmanPosition(), legals, kind='manhattan')
 
 
-        print(legals, len(legals))
+
         legal = randint(0, len(legals) - 1)
         print(legal)
         return legal
