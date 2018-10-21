@@ -56,27 +56,30 @@ class PacmanAgent(Agent):
         if not self.queueDirections:  # isempty():
             posPacman = state.getPacmanPosition()
             goal = []#self.posFood[0]
-            print(goal)
             higher_dist = 0
 
-            print(len(self.posFood))
-            for i in range(len(self.posFood)):
-                # TODO: here we can implement an euclidean function dist to select the shortest one
-                food_distance = distance.euclidean(posPacman, self.posFood[i])
-                if food_distance > higher_dist:
-                    goal = self.posFood[i]
-                    higher_dist = food_distance
+            # print(len(self.posFood))
+            # for i in range(len(self.posFood)):
+            #     # TODO: here we can implement an euclidean function dist to select the shortest one
+            #     food_distance = distance.euclidean(posPacman, self.posFood[i])
+            #     # print(food_distance)
+            #     if food_distance > higher_dist:
+            #
+            #         goal = self.posFood[i]
+            #         print(higher_dist)
+            #         higher_dist = food_distance
 
-
+            goal = self.posFood[self.get_nearest_goal(posPacman, "manhattan")]
+            print(goal)
             # Searching of the path to the goal
             dfs = self.dfs(state, goal, posPacman)
-            # path = self.graph(goal, dfs, state)
+
             x, y = posPacman
-            current = goal
+            actual_goal = goal
             path = [goal]
-            while not (current[0] == x and current[1] == y):
-                current = dfs[current]
-                path.append(current)
+            while not (actual_goal[0] == x and actual_goal[1] == y):
+                actual_goal = dfs[actual_goal]
+                path.append(actual_goal)
 
             print("is a Win path -", path)
             # Enter the path to follow
@@ -170,15 +173,15 @@ class PacmanAgent(Agent):
 
                     fringe.put((-depth_node, next_mov, visited + [next_mov]))
 
+    def get_nearest_goal(self, posPacman, type='euclidean'):
+        goals = []
+        for i in self.posFood:
+            if type == 'euclidean':
+                goals.append(distance.euclidean(posPacman, i))
+            elif type == 'manhattan':
+                goals.append(distance.cityblock(posPacman, i))
 
-    def graph(self, goal, previous_State, state):
 
-        x, y = state.getPacmanPosition()
-        current = goal
-        path = [goal]
-        while not (current[0] == x and current[1] == y):
-            current = previous_State[current]
-            path.append(current)
+        print(goals)
+        return goals.index(min(goals))
 
-        print("is a Win path -",path)
-        return path
