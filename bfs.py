@@ -52,7 +52,6 @@ class PacmanAgent(Agent):
                 for j in range(len(currentFood[0])):  # rows
                     if currentFood[i][j] == True:
                         self.posFood.append((i, j))
-
         if not self.queueDirections:  # isempty():
             posPacman = state.getPacmanPosition()
             goal = []  # self.posFood[0]
@@ -73,13 +72,13 @@ class PacmanAgent(Agent):
             # goal = self.posFood[self.get_nearest_goal(posPacman, "manhattan")]
             print("next goal-> ", goal)
             # Searching of the path to the goal
-            dfs = self.dfs(state, goal, posPacman)
+            bfs = self.bfs(state, goal, posPacman)
 
             x, y = posPacman
             actual_goal = goal
             path = [goal]
             while not (actual_goal[0] == x and actual_goal[1] == y):
-                actual_goal = dfs[actual_goal]
+                actual_goal = bfs[actual_goal]
                 path.append(actual_goal)
 
             print("is a Win path -", path)
@@ -134,7 +133,7 @@ class PacmanAgent(Agent):
 
         return movements
 
-    def dfs(self, state, posFood, posPacman, ):
+    def bfs(self, state, posFood, posPacman, ):
 
         previous_state = {}
         visited = []
@@ -149,7 +148,7 @@ class PacmanAgent(Agent):
         while not fringe.empty():
 
             depth, actualPos, visited = fringe.get()
-            print("out side",depth)
+            print("out side", depth)
             # Creation of node
             state.generatePacmanSuccessors()
 
@@ -173,7 +172,7 @@ class PacmanAgent(Agent):
                     depth_node = len(previous_state)
                     print(depth_node)
 
-                    fringe.put((-depth_node, next_mov, visited + [next_mov]))
+                    fringe.put((depth_node, next_mov, visited + [next_mov]))
 
     def get_nearest_goal(self, posPacman, type=None):
         goals = []
