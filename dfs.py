@@ -2,11 +2,11 @@
 
 from pacman_module.game import Agent
 from pacman_module.pacman import Directions
+
 import numpy as np
-import random
-from random import randint
 from queue import PriorityQueue
 from scipy.spatial import distance
+
 
 class PacmanAgent(Agent):
     def __init__(self, args):
@@ -55,22 +55,23 @@ class PacmanAgent(Agent):
 
         if not self.queueDirections:  # isempty():
             posPacman = state.getPacmanPosition()
-            goal = []#self.posFood[0]
+            goal = []  # self.posFood[0]
             higher_dist = 0
 
             # print(len(self.posFood))
-            # for i in range(len(self.posFood)):
-            #     # TODO: here we can implement an euclidean function dist to select the shortest one
-            #     food_distance = distance.euclidean(posPacman, self.posFood[i])
-            #     # print(food_distance)
-            #     if food_distance > higher_dist:
-            #
-            #         goal = self.posFood[i]
-            #         print(higher_dist)
-            #         higher_dist = food_distance
+            for i in range(len(self.posFood)):
+                # TODO: here we can implement an euclidean function dist to select the shortest one
+                # right now we are just going for the farthest one
+                food_distance = distance.cityblock(posPacman, self.posFood[i])
+                print(food_distance)
+                if food_distance > higher_dist:
 
-            goal = self.posFood[self.get_nearest_goal(posPacman, "manhattan")]
-            print(goal)
+                    goal = self.posFood[i]
+                    higher_dist = food_distance
+                    print(higher_dist, "|| actual index - ", i)
+
+            # goal = self.posFood[self.get_nearest_goal(posPacman, "manhattan")]
+            print("next goal-> ", goal)
             # Searching of the path to the goal
             dfs = self.dfs(state, goal, posPacman)
 
@@ -88,30 +89,30 @@ class PacmanAgent(Agent):
 
             # self.queueDirections.append([path[i] for i in range(len(path))])
         else:
-            next_path_move = self.queueDirections.pop() # pop() for LIFO, pop(0) for FIFO
+            next_path_move = self.queueDirections.pop()  # pop() for LIFO, pop(0) for FIFO
             x_new, y_new = next_path_move
             print("next Move - ", next_path_move)  # [0], ss[1])
             actual_posPacman = state.getPacmanPosition()
             actual_posFood = state.getFood()
 
-            if tuple(np.subtract(actual_posPacman, (1,0))) == next_path_move:
+            if tuple(np.subtract(actual_posPacman, (1, 0))) == next_path_move:
                 if actual_posFood[x_new][y_new]:
-                    self.posFood.remove((x_new,y_new))
+                    self.posFood.remove((x_new, y_new))
                 return Directions.WEST
             elif tuple(np.subtract(actual_posPacman, (0, 1))) == next_path_move:
                 if actual_posFood[x_new][y_new]:
-                    self.posFood.remove((x_new,y_new))
+                    self.posFood.remove((x_new, y_new))
                 return Directions.SOUTH
             elif tuple(np.add(actual_posPacman, (0, 1))) == next_path_move:
                 if actual_posFood[x_new][y_new]:
-                    self.posFood.remove((x_new,y_new))
+                    self.posFood.remove((x_new, y_new))
                 return Directions.NORTH
             elif tuple(np.add(actual_posPacman, (1, 0))) == next_path_move:
                 if actual_posFood[x_new][y_new]:
-                    self.posFood.remove((x_new,y_new))
+                    self.posFood.remove((x_new, y_new))
                 return Directions.EAST
-            else: return Directions.STOP
-
+            else:
+                return Directions.STOP
 
         return Directions.STOP
 
@@ -122,13 +123,13 @@ class PacmanAgent(Agent):
         walls = s.getWalls()
         # print(walls[a][b])
 
-        if not walls[a + 1][b]: # for East move
+        if not walls[a + 1][b]:  # for East move
             movements.append((a + 1, b))
-        if not walls[a - 1][b]: # for West move
+        if not walls[a - 1][b]:  # for West move
             movements.append((a - 1, b))
-        if not walls[a][b + 1]: # for North move
+        if not walls[a][b + 1]:  # for North move
             movements.append((a, b + 1))
-        if not walls[a][b - 1]: # for South move
+        if not walls[a][b - 1]:  # for South move
             movements.append((a, b - 1))
 
         return movements
@@ -173,7 +174,7 @@ class PacmanAgent(Agent):
 
                     fringe.put((-depth_node, next_mov, visited + [next_mov]))
 
-    def get_nearest_goal(self, posPacman, type='euclidean'):
+    def get_nearest_goal(self, posPacman, type=None):
         goals = []
         for i in self.posFood:
             if type == 'euclidean':
@@ -181,7 +182,4 @@ class PacmanAgent(Agent):
             elif type == 'manhattan':
                 goals.append(distance.cityblock(posPacman, i))
 
-
-        print(goals)
         return goals.index(min(goals))
-
